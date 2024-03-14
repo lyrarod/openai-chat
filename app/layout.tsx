@@ -29,7 +29,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           {children}
         </ThemeProvider>
       </body>

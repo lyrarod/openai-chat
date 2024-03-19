@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Next.js 14 OpenAI Chatbot",
-    default: "Next.js 14 OpenAI Chatbot",
+    template: "%s | OpenAI Chatbot",
+    default: "OpenAI Chatbot",
   },
-  description: "Next.js 14 OpenAI Chatbot",
+  description: "OpenAI Chatbot Next.js 14",
 };
 
 export default function RootLayout({
@@ -29,7 +28,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <ModeToggle /> */}
           {children}
         </ThemeProvider>
       </body>

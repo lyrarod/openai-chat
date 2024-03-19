@@ -8,8 +8,10 @@ import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
-import { Ban, Bot, Loader, SendHorizontalIcon, User } from "lucide-react";
+import { Ban, Loader, SendHorizontalIcon, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { OpenaiLogo } from "./openai-logo";
+import { OpenaiIcon } from "./openai-icon";
 
 export default function Chat() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -22,29 +24,72 @@ export default function Chat() {
   }, [messages]);
 
   return (
-    <div className="relative w-full max-w-lg p-2 mx-auto border rounded-md">
-      <ModeToggle className={"absolute right-4 top-4"} />
+    <>
+      <div className="sticky top-0 left-0 z-10 flex flex-col items-center w-full px-4 py-6 mx-auto border-b shadow gap-y-4 bg-background">
+        <div className="flex items-center justify-between w-full max-w-xl">
+          <OpenaiLogo
+            className={"w-full max-w-28 sm:max-w-36 dark:fill-primary"}
+          />
+          <ModeToggle />
+        </div>
 
-      <ScrollArea className="mb-2 h-[400px]" ref={scrollRef}>
+        <form onSubmit={handleSubmit} className="relative flex w-full max-w-xl">
+          <Input
+            value={input}
+            onChange={handleInputChange}
+            type="search"
+            placeholder={!isLoading ? "Say something..." : ""}
+            disabled={isLoading}
+            className="pr-16 placeholder:italic"
+          />
+          <Button
+            size={"default"}
+            variant={"default"}
+            type="submit"
+            disabled={isLoading || !input.trim() || input.trim().length < 2}
+            className="absolute top-0 right-0 transition rounded-l-none"
+          >
+            {isLoading && <Loader className="animate-spin" />}
+            {!isLoading && (!input.trim() || input.trim().length < 2) && (
+              <Ban />
+            )}
+            {!isLoading && input.trim().length > 1 && <SendHorizontalIcon />}
+          </Button>
+        </form>
+      </div>
+
+      <ScrollArea
+        className="h-[80vh] w-full max-w-xl flex sm:border sm:border-t-0 mx-auto rounded-b-md sm:shadow-md"
+        ref={scrollRef}
+      >
         {messages.map((m) => {
           const isUser = m.role === "user";
-          const isBot = m.role === "assistant";
 
           return (
             <div key={m.id} className="whitespace-pre-wrap">
-              <div className="flex gap-2 mb-4">
+              <div
+                className={cn("flex gap-2 px-4 py-3", {
+                  "dark:bg-muted/25 bg-muted/50": !isUser,
+                })}
+              >
                 <Avatar>
                   <AvatarImage src="" />
                   <AvatarFallback
-                    className={`text-xs ${cn(isBot && "bg-primary")}`}
+                    title={isUser ? "User" : "OpenAI"}
+                    className={cn("", !isUser && "bg-primary")}
                   >
-                    {isUser ? <User /> : <Bot />}
+                    {isUser ? (
+                      <User />
+                    ) : (
+                      <OpenaiIcon className="w-6 h-6 fill-background" />
+                    )}
                   </AvatarFallback>
                 </Avatar>
-                <div className={`mt-1.5`}>
-                  <div className={`mt-1.5 text-sm`}>
+                <div>
+                  <div className={`mt-2.5 text-sm sm:text-base`}>
                     <span className={`font-semibold`}>
-                      {isUser ? "User: " : "AI: "}
+                      {isUser ? "User" : "AI"}
+                      {": "}
                     </span>
 
                     <span className={`text-muted-foreground`}>
@@ -57,28 +102,6 @@ export default function Chat() {
           );
         })}
       </ScrollArea>
-
-      <form onSubmit={handleSubmit} className="relative">
-        <Input
-          value={input}
-          onChange={handleInputChange}
-          type="search"
-          placeholder={!isLoading ? "Say something..." : ""}
-          disabled={isLoading}
-          className="pr-10 placeholder:italic"
-        />
-        <Button
-          type="submit"
-          disabled={isLoading || !input.trim()}
-          variant={"default"}
-          size={"icon"}
-          className="absolute top-0 right-0 transition rounded-l-none rounded-r-md"
-        >
-          {isLoading && <Loader className="animate-spin" />}
-          {!isLoading && !input.trim() && <Ban />}
-          {!isLoading && input.trim() && <SendHorizontalIcon />}
-        </Button>
-      </form>
-    </div>
+    </>
   );
 }
